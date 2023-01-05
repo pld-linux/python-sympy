@@ -3,13 +3,13 @@
 %bcond_without	doc	# HTML and PDF documentation
 %bcond_without	tests	# unit tests
 %bcond_without	python2 # CPython 2.x module
-%bcond_without	python3 # CPython 3.x module
+%bcond_with	python3 # CPython 3.x module (built from python3-sympy.spec)
 
 Summary:	Python 2 library for symbolic mathematics
 Summary(pl.UTF-8):	Biblioteka Pythona 2 do matematyki symbolicznej
 Name:		python-sympy
 Version:	1.5.1
-Release:	1
+Release:	2
 License:	BSD
 Group:		Libraries/Python
 #Source0Download: https://pypi.org/simple/sympy/
@@ -115,37 +115,39 @@ Dokumentacja do SymPy w formacie HTML.
 %endif
 
 %if %{with doc}
-pydir=$(pwd)/build-3/lib
-cd doc
-PYTHONPATH=$pydir \
-%{__make} html \
+PYTHONPATH=$(pwd) \
+%{__make} -C doc html \
 	SPHINXBUILD=sphinx-build-3
-%{__make} cheatsheet
+%{__make} -C doc cheatsheet
 %endif
 
 %install
 rm -rf $RPM_BUILD_ROOT
-
-%if %{with python3}
-%py3_install
-
-%{__mv} $RPM_BUILD_ROOT%{_bindir}/isympy{,3}
-
-install -d $RPM_BUILD_ROOT%{_examplesdir}/python3-sympy-%{version}
-cp -a examples/* $RPM_BUILD_ROOT%{_examplesdir}/python3-sympy-%{version}
-find $RPM_BUILD_ROOT%{_examplesdir}/python3-sympy-%{version} -name '*.py' \
-	| xargs sed -i '1s|^#!.*python\b|#!%{__python3}|'
-%endif
 
 %if %{with python2}
 %py_install
 
 %py_postclean
 
+%{__mv} $RPM_BUILD_ROOT%{_bindir}/isympy{,2}
+%{__mv} $RPM_BUILD_ROOT%{_mandir}/man1/isympy{,2}.1
+
 install -d $RPM_BUILD_ROOT%{_examplesdir}/%{name}-%{version}
 cp -a examples/* $RPM_BUILD_ROOT%{_examplesdir}/%{name}-%{version}
 find $RPM_BUILD_ROOT%{_examplesdir}/%{name}-%{version} -name '*.py' \
 	| xargs sed -i '1s|^#!.*python\b|#!%{__python}|'
+%endif
+
+%if %{with python3}
+%py3_install
+
+%{__mv} $RPM_BUILD_ROOT%{_bindir}/isympy{,3}
+ln -sf isympy3 $RPM_BUILD_ROOT%{_bindir}/isympy
+
+install -d $RPM_BUILD_ROOT%{_examplesdir}/python3-sympy-%{version}
+cp -a examples/* $RPM_BUILD_ROOT%{_examplesdir}/python3-sympy-%{version}
+find $RPM_BUILD_ROOT%{_examplesdir}/python3-sympy-%{version} -name '*.py' \
+	| xargs sed -i '1s|^#!.*python\b|#!%{__python3}|'
 %endif
 
 %clean
@@ -155,11 +157,11 @@ rm -rf $RPM_BUILD_ROOT
 %files
 %defattr(644,root,root,755)
 %doc AUTHORS LICENSE README.rst
-%attr(755,root,root) %{_bindir}/isympy
+%attr(755,root,root) %{_bindir}/isympy2
 %{py_sitescriptdir}/isympy.py[co]
 %{py_sitescriptdir}/sympy
 %{py_sitescriptdir}/sympy-%{version}-*.egg-info
-%{_mandir}/man1/isympy.1*
+%{_mandir}/man1/isympy2.1*
 %{_examplesdir}/%{name}-%{version}
 %endif
 
@@ -167,11 +169,13 @@ rm -rf $RPM_BUILD_ROOT
 %files -n python3-sympy
 %defattr(644,root,root,755)
 %doc AUTHORS LICENSE README.rst
+%attr(755,root,root) %{_bindir}/isympy
 %attr(755,root,root) %{_bindir}/isympy3
 %{py3_sitescriptdir}/isympy.py
 %{py3_sitescriptdir}/__pycache__/isympy.cpython-*.py[co]
 %{py3_sitescriptdir}/sympy
 %{py3_sitescriptdir}/sympy-%{version}-*.egg-info
+%{_mandir}/man1/isympy.1*
 %{_examplesdir}/python3-sympy-%{version}
 %endif
 
