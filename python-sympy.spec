@@ -2,20 +2,20 @@
 # Conditional build:
 %bcond_without	doc	# HTML and PDF documentation
 %bcond_without	tests	# unit tests
-%bcond_with	python2 # CPython 2.x module
+%bcond_without	python2 # CPython 2.x module
 %bcond_without	python3 # CPython 3.x module
 
 Summary:	Python 2 library for symbolic mathematics
 Summary(pl.UTF-8):	Biblioteka Pythona 2 do matematyki symbolicznej
 Name:		python-sympy
-Version:	1.7.1
-Release:	3
+Version:	1.5.1
+Release:	1
 License:	BSD
 Group:		Libraries/Python
 #Source0Download: https://pypi.org/simple/sympy/
 Source0:	https://files.pythonhosted.org/packages/source/s/sympy/sympy-%{version}.tar.gz
-# Source0-md5:	f5973bcbe33fdc86203ca397cc901994
-Patch0:		docs-build.patch
+# Source0-md5:	b11b310c3e1642bf66e51038cb3c0021
+Patch0:		%{name}-nodisplay.patch
 URL:		https://www.sympy.org/
 BuildRequires:	gettext
 BuildRequires:	graphviz
@@ -40,7 +40,6 @@ BuildRequires:	python3-numpy
 %endif
 %endif
 %if %{with doc}
-BuildRequires:	fonts-TTF-DejaVu
 BuildRequires:	pydoc3
 BuildRequires:	python3-matplotlib
 BuildRequires:	python3-mpmath >= 0.19
@@ -155,24 +154,24 @@ rm -rf $RPM_BUILD_ROOT
 %if %{with python2}
 %files
 %defattr(644,root,root,755)
-%doc AUTHORS LICENSE README.md
+%doc AUTHORS LICENSE README.rst
 %attr(755,root,root) %{_bindir}/isympy
 %{py_sitescriptdir}/isympy.py[co]
 %{py_sitescriptdir}/sympy
 %{py_sitescriptdir}/sympy-%{version}-*.egg-info
+%{_mandir}/man1/isympy.1*
 %{_examplesdir}/%{name}-%{version}
 %endif
 
 %if %{with python3}
 %files -n python3-sympy
 %defattr(644,root,root,755)
-%doc AUTHORS LICENSE README.md
+%doc AUTHORS LICENSE README.rst
 %attr(755,root,root) %{_bindir}/isympy3
 %{py3_sitescriptdir}/isympy.py
 %{py3_sitescriptdir}/__pycache__/isympy.cpython-*.py[co]
 %{py3_sitescriptdir}/sympy
 %{py3_sitescriptdir}/sympy-%{version}-*.egg-info
-%{_mandir}/man1/isympy.1*
 %{_examplesdir}/python3-sympy-%{version}
 %endif
 
