@@ -103,7 +103,7 @@ Dokumentacja do SymPy w formacie HTML.
 
 %prep
 %setup -q -n sympy-%{version}
-%patch0 -p1
+%patch -P0 -p1
 
 %build
 %if %{with python2}
